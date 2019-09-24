@@ -6,3 +6,4 @@ exercise
 .venv
 .idea
 *.graphml
+*.pyc

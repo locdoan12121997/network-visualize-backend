@@ -1,16 +1,12 @@
 from flask import Flask
+
 from api.edge import blueprint as edge_bp
-import igraph as ig
+from api.graph import blueprint as graph_bp
 
 app = Flask(__name__)
 app.register_blueprint(edge_bp)
+app.register_blueprint(graph_bp)
 
-
-def get_db(filename=None):
-    if 'graph' not in g:
-        g.graph = ig.Graph.Read_GraphML(filename)
-
-    return g.graph
 
 if __name__ == '__main__':
     app.run()
