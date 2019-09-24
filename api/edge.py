@@ -43,7 +43,7 @@ def add_edges(*args):
 
 
 @blueprint.route('/delete_edges', methods=['GET'])
-def delete_all_edges(edge_list=None):
+def delete_edges(edge_list=None):
     graph_as_input.delete_edges(edge_list)
     return "ok"
 
