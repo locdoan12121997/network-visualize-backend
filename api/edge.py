@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response
-from igraph import Graph, Edge, EdgeSeq
+from igraph import Graph, Edge
 
 blueprint = Blueprint('edge', __name__)
 
@@ -9,8 +9,17 @@ graph_as_input = Graph.Read_GraphML("./api/mock/NREN.graphml")
 @blueprint.route('/edges', methods=['GET'])
 def get_edges():
     #   args = {
-    #       "edges": [ints]
+    #       "edges": [{
+    #           "source": int,
+    #           "target": int
+    #        },...]
     #   }
+    #
+    #    or
+    #
+    #    args = {
+    #       "edges": [ints or None]
+    #    }
 
     args = request.json
     edge_list = get_list(args)
@@ -40,6 +49,41 @@ def add_edges():
     return make_response(jsonify(response), 201)
 
 
+@blueprint.route('/edges', methods=['PUT'])
+def edit_edge():  # for now, can only edit one edge at a time
+    # args = {
+    #       "edge": {
+    #           "source": int,
+    #           "target": int
+    #        },
+    #       "attribute_name": string
+    #       "new_value": string or int
+    #   }
+    #
+    #    or
+    #
+    #    args = {
+    #       "edge": int,
+    #       "attribute_name": string
+    #       "new_value": string or int
+    #    }
+
+    args = request.json
+    edge_id = args["edge"]
+    attr = args["attribute_name"]
+    new_value = args["new_value"]
+
+    if isinstance(edge_id, int):
+        edge = graph_as_input.es[edge_id]
+    else:
+        edge = graph_as_input.es[graph_as_input.get_eid(edge_id["source"], edge_id["target"])]
+
+    edge[attr] = new_value
+
+    response = {"action": "Edit", "code": "Success"}
+    return make_response(jsonify(response), 201)
+
+
 @blueprint.route('/edges', methods=['DELETE'])
 def delete_edges():
     #   args = {
@@ -52,7 +96,7 @@ def delete_edges():
     #    or
     #
     #    args = {
-    #       "edges": [ints]
+    #       "edges": [ints or None]
     #    }
 
     args = request.json
@@ -71,11 +115,13 @@ def edge_dictify(edge_list):
     if len(edge_list) == 0:
         edge_list = graph_as_input.es
 
-    for edge in edge_list:
-        if isinstance(edge, int):
-            edge = graph_as_input.es[edge]
-        elif isinstance(edge, tuple):
-            edge = graph_as_input.es[graph_as_input.get_eid(edge[0], edge[1])]
+    for edge_id in edge_list:
+        if isinstance(edge_id, Edge):
+            edge = edge_id
+        elif isinstance(edge_id, int):
+            edge = graph_as_input.es[edge_id]
+        else:
+            edge = graph_as_input.es[graph_as_input.get_eid(edge_id[0], edge_id[1])]
         append_edge_to_dictionary(edge_dict, attributes, edge)
 
     return edge_dict
