@@ -1,0 +1,1 @@
+/home/loc/working/graph-exercise/exercise/networks/NREN.graphml
