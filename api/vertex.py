@@ -66,12 +66,13 @@ def delete_vertices():
     attr = args["attribute_name"]
     value = args["value"]
 
-    if attr == "index" :
+    if attr == "index":
         vertex_list = value
         edge_list = [edge.index for edge in graph_as_input.es if edge.source == value or edge.target == value]
     else:
         vertex_list = [vertex.index for vertex in graph_as_input.vs if vertex[attr] == value]
-        edge_list = [edge.index for edge in graph_as_input.es if edge.source in vertex_list or edge.target in vertex_list]
+        edge_list = [edge.index for edge in graph_as_input.es if edge.source in vertex_list
+                     or edge.target in vertex_list]
 
     graph_as_input.delete_vertices(vertex_list)
     graph_as_input.delete_edges(edge_list)
